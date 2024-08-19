@@ -35,14 +35,19 @@ def get_signal_level(interface)
       signal_level = $1
       signal_value = $1.to_i
       # 各信号強度範囲に応じて評価を行う
-      signal_quality = case signal_value
-                       when -30..-50 then "優良"   # 非常に強い信号
-                       when -51..-60 then "良好"   # 十分な強度
-                       when -61..-70 then "普通"   # やや弱いが許容範囲
-                       when -71..-80 then "弱い"   # 弱い信号
-                       else "非常に弱い"          # 極めて弱い、接続に問題が生じる可能性がある
-                       end
-      result += "信号強度: #{signal_level}（#{signal_quality}）、"
+      # 各信号強度範囲に応じて評価を行う
+      signal_quality = if signal_value >= -50
+                          "優良"   # 非常に強い信号
+                        elsif signal_value >= -60
+                          "良好"   # 十分な強度
+                        elsif signal_value >= -70
+                          "普通"   # やや弱いが許容範囲
+                        elsif signal_value >= -80
+                          "弱い"   # 弱い信号
+                        else
+                          "非常に弱い"  # 極めて弱い、接続に問題が生じる可能性がある
+      end
+result += "信号強度: #{signal_level}（#{signal_quality}）、"
     end
 
     # Link Qualityの評価
@@ -87,7 +92,7 @@ def get_signal_level(interface)
   end
 end
 
-# 20回繰り返して信号強度を測定する
+# 30回繰り返して信号強度を測定する
 30.times do
   begin
     # Wi-Fiの情報を取得して表示
